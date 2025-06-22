@@ -25,4 +25,4 @@ A simple Java console-based to-do list application that allows users to:
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/yourusername/todo-java-app.git
+   git clone [https://github.com/Kaustub593S/Projects]
