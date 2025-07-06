@@ -12,118 +12,128 @@ public class Todo
     public static Scanner pro=new Scanner(System.in);
     public static final String FILE_NAME = "tasks.txt";
 
-    public static void insert(HashSet<String> hs)
+    public static void insert(ArrayList<Task> tasks) 
     {
-        System.out.println("Enter the task to add");
-        String task=pro.nextLine().trim().toLowerCase();
-        if(task.isEmpty())
-        {
-            System.out.println("Task Cannot be Empty");
-            return;
-        }
-        if(hs.contains(task))
-        {
-            System.out.println("Task already Present");
-            return;
-        }
-        hs.add(task);
-        save(hs, FILE_NAME);
-        System.out.println("Task Successfully Added");
+    System.out.println("Enter the task description:");
+    String desc = pro.nextLine().trim();
+
+    System.out.println("Enter the priority (High/Medium/Low):");
+    String priority = pro.nextLine().trim();
+
+    System.out.println("Enter the due date (YYYY-MM-DD):");
+    String dueDate = pro.nextLine().trim();
+
+    Task newTask = new Task(desc, priority, dueDate);
+
+    if (tasks.contains(newTask)) 
+    {
+        System.out.println("Task already exists.");
+        return;
     }
-    public static void delete(HashSet<String> hs)
-    {
-        System.out.println("Enter the task to delete");
-        String task=pro.nextLine().trim().toLowerCase();
-        if(!hs.contains(task))
-        {
-            System.out.println("Task Not present");
-            return;
-        }
-        hs.remove(task);
-        save(hs, FILE_NAME);
-        System.out.println("Task Successfully Deleted");
+
+    tasks.add(newTask);
+    save(tasks, FILE_NAME);
+    System.out.println("Task Successfully Added.");
     }
-    public static void display(HashSet<String> hs) 
+
+    public static void delete(ArrayList<Task> tasks) 
     {
-        if (hs.isEmpty()) 
+    System.out.println("Enter the description of the task to delete:");
+    String desc = pro.nextLine().trim().toLowerCase();
+
+    boolean removed = tasks.removeIf(task -> task.getDescription().equalsIgnoreCase(desc));
+    if (removed) 
+    {
+        save(tasks, FILE_NAME);
+        System.out.println("Task deleted.");
+    } 
+    else 
+    {
+        System.out.println("Task not found.");
+    }
+    }
+
+    public static void display(ArrayList<Task> tasks) 
+    {
+        if (tasks.isEmpty())
         {
             System.out.println("No tasks available.");
         } 
-        else
+        else 
         {
-            System.out.println("Current Tasks:");
-            for (String task : hs) 
-            {
-                System.out.println("- " + task);
-            }
-        }
-    }
-    public static void load(HashSet<String> hs, String fileName)
-    {
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName)))
-        {
-            String line;
-            while ((line = br.readLine()) != null)
-            {
-                if (!line.trim().isEmpty())
-                    hs.add(line.trim().toLowerCase());
-            }
-        }
-        catch (FileNotFoundException e)
-        {
+            System.out.println("Tasks:");
+            for (Task task : tasks) 
+             System.out.println("- " + task);
             
         }
-        catch (IOException e)
+    }
+
+    public static void load(ArrayList<Task> tasks, String fileName) 
+    {
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) 
+        {
+            String line;
+            while ((line = br.readLine()) != null) 
+            {
+                String[] parts = line.split("\\|");
+                if (parts.length == 3) {
+                    Task task = new Task(parts[0], parts[1], parts[2]);
+                    tasks.add(task);
+                }
+            }
+        } 
+        catch (FileNotFoundException e) 
+        {
+            // First run, file might not exist — ignore
+        } 
+        catch (IOException e) 
         {
             System.out.println("Error reading from file.");
         }
     }
 
-    public static void save(HashSet<String> hs, String fileName)
+
+    public static void save(ArrayList<Task> tasks, String fileName) 
     {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName)))
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) 
         {
-            for (String task : hs)
-                bw.write(task + "\n");
-        }
-        catch (IOException e)
+            for (Task task : tasks) 
+            {
+                bw.write(task.getDescription() + "|" + task.getPriority() + "|" + task.getDueDate() + "\n");
+            }
+        } 
+        catch (IOException e) 
         {
             System.out.println("Error saving to file.");
         }
     }
 
 
+
     public static void main(String[] args) 
     {
-        String str;
-        LinkedHashSet<String> hs=new LinkedHashSet<>();
-        load(hs, FILE_NAME); // load tasks on startup
-        do
-        {
-            
-            System.out.println("What Would You Like To do Today:\n1.Add a Task \n2.Remove a Task \n3.Display Tasks");
-            str=pro.nextLine();
-            if(str.equalsIgnoreCase("Add a Task")||str.equals("1"))
-            {
-                insert(hs);
-            }
+    ArrayList<Task> tasks = new ArrayList<>();
+    load(tasks, FILE_NAME);
 
-            else if(str.equalsIgnoreCase("Remove a Task")||str.equals("2"))
-            {
-                delete(hs);
-            }
-            else if(str.equalsIgnoreCase("Display Tasks")||str.equals("3"))
-            {
-                display(hs);
-            }
-            else
-            {
-                System.out.println("Invalid Input!");
-            }
-            System.out.println("Type Exit or -1 to exit the program or Anything to continue");
-            str=pro.nextLine();
-        }while(!(str.equalsIgnoreCase("Exit")||str.equalsIgnoreCase("-1")));
-        System.out.println("Byee! Come Back Soon");
-    
+    String str;
+    do 
+    {
+        System.out.println("What would you like to do?\n1. Add Task\n2. Remove Task\n3. Display Tasks");
+        str = pro.nextLine();
+
+        if (str.equalsIgnoreCase("1") || str.equalsIgnoreCase("Add Task"))
+            insert(tasks);
+        else if (str.equalsIgnoreCase("2") || str.equalsIgnoreCase("Remove Task"))
+            delete(tasks);
+        else if (str.equalsIgnoreCase("3") || str.equalsIgnoreCase("Display Tasks"))
+            display(tasks);
+        else
+            System.out.println("Invalid Input!");
+
+        System.out.println("Type Exit or -1 to quit, or anything else to continue.");
+        str = pro.nextLine();
+    } while (!(str.equalsIgnoreCase("exit") || str.equals("-1")));
+
+    System.out.println("Bye! Come back soon.");
     }
 }
