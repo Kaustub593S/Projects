@@ -1,0 +1,76 @@
+package NumberGuess;
+
+import java.util.Scanner;
+
+public class RandnumNo
+{
+    
+    public static int random()
+    {
+        return (int) (Math.random()*100+1);
+    }
+    public static void main(String args[])
+    {
+        Scanner sc= new Scanner(System.in);
+       
+        int total_Score=0;
+        boolean play=true;
+        while(play)
+        {
+            int n=random();
+            System.out.println("Lets start the Game");
+            int in;
+            boolean found=false;
+            int score=0;
+            int i=6;
+            do
+            {
+                System.out.println("Guess the no");
+                in=sc.nextInt();
+
+                if (in<n) 
+                System.out.println("Too low! Try again.");
+
+                else if (in>n)
+                System.out.println("Too high! Try again.");
+
+                else 
+                {
+                    found=true;
+                    score=i*20;
+                    System.out.println("Congratulations! You win");
+                    break;
+                }
+                i--;
+
+            }while(i>0);
+
+            if(found==false)
+            {
+                System.out.println("You lose!! Better Luck next Time");
+                System.out.println("The number was "+n);
+            }
+
+
+            total_Score+=score;
+            System.out.println("Your Round Score= "+score);
+            System.out.println("Your Total Score= "+total_Score);
+            System.out.print("Do you want to play again? \n 1. Yes 2.No \n");
+            int call=sc.nextInt();
+            
+
+
+            if(call==1)
+            play=true;
+
+            else
+            play=false;
+
+        }
+
+       
+        
+        sc.close();
+    }
+}
+
